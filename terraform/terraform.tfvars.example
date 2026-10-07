@@ -1,0 +1,13 @@
+subscription_id = "00000000-0000-0000-0000-000000000000"
+tenant_id       = "00000000-0000-0000-0000-000000000000"
+avd_user_upns   = ["you@yourtenant.onmicrosoft.com"]
+
+# location = "northeurope"   # Dublin
+# vm_size  = "Standard_D8ads_v7"
+
+# GPU (DaVinci Resolve / Unreal Engine). Needs NVadsA10v5 quota in the region:
+# vm_size                   = "Standard_NV36ads_A10_v5"
+# install_nvidia_gpu_driver = true
+
+# Golden image built with ../image (Azure Compute Gallery image definition = always latest version):
+# gallery_image_version_id = "/subscriptions/<sub>/resourceGroups/rg-avd-copilot-images/providers/Microsoft.Compute/galleries/galavdcopilot/images/win11-avd-copilot"

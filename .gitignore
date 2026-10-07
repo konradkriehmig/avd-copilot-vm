@@ -1,0 +1,25 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Packer
+packer_cache/
+*.pkrvars.hcl
+crash.log
+
+# Environment-specific / secrets (tenant IDs, subscription IDs, UPNs, backups)
+*.local.md
+local/
+*.pfx
+*.pem
+.env
