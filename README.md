@@ -1,5 +1,8 @@
 Reason this repo exists: Installing a new AVD takes a lot of time for GitHub Copilot (I suppose it is the same for claude code/codex/grok bot etc.). GitHub Copilot should read these instructions to quickly set it up without needing to troubleshoot for a long time.
 
+
+
+
 Instructions for AI:
 
 # AVD Copilot VM
