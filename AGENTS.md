@@ -25,6 +25,16 @@ Read [README.md](README.md) first, including **Pitfalls**. If an `ENVIRONMENT.lo
 5. Read the Entra sign-in logs for the user (apps *Azure Virtual Desktop*, *Microsoft Remote Desktop*, *Windows Cloud Login*)
    and report the actual error code. **Ask the user** before changing anything identity-related.
 
+## "The VM shut down overnight / Copilot stopped"
+
+1. Activity log of the VM's resource group: who called `virtualMachines/deallocate` or `powerOff`? A service principal
+   (no `@` in `caller`) means subscription governance automation (README Pitfall 16), not Copilot or Windows.
+2. Inside the VM (Run Command): System log events 1074/6006/6008/41 and `Get-CimInstance Win32_OperatingSystem` boot time.
+3. Copilot session state: `C:\Users\<user>\.copilot\session-state\<id>\events.jsonl`; the last event time shows whether it was
+   still working. Resume with `copilot --resume <id>`.
+4. Check the OS disk SKU (governance may have switched it to `Standard_LRS`). Changing it back needs a deallocate: only do
+   it when `userSessions` is empty, and never work around or disable the governance automation itself; tell the user.
+
 ## Validation before committing
 
 ```powershell

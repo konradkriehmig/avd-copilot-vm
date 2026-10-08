@@ -68,6 +68,11 @@ The local admin (`terraform output -raw admin_password`) is break-glass only, e.
   Only use `--allow-all` / `--yolo` on this isolated VM.
 - `/remote` in Copilot CLI lets you watch or steer the session from GitHub web/mobile, so you don't need to open AVD.
 - The VM has no auto-shutdown and *Start VM on connect* is off: it stays on (and billed) until you stop it.
+- **Check the subscription has no nightly shutdown automation before relying on it.** Some managed/demo subscriptions
+  run governance automation that deallocates every VM once a day (killing the Copilot run) and switches the OS disk to
+  Standard HDD. See Pitfall 16. If yours does, get an exemption or use a different subscription for overnight work.
+- If a run was interrupted, the session isn't lost: reconnect and run `copilot --resume <session-id>` (or `/resume`),
+  then tell it what happened so it re-checks the state of long-running operations.
 
 ## Golden image (`image/`)
 
@@ -97,6 +102,18 @@ Blender, VS Code, Python and Copilot run fine on the default CPU size.
 13. **Run Command has a stale PATH**: tools installed in the same run aren't on `PATH`. Use full paths.
 14. **Windows PowerShell 5.1** (Run Command / Packer): `Invoke-RestMethod` returns JSON arrays as one object (wrap in parentheses), native stderr + `$ErrorActionPreference='Stop'` aborts scripts, and SChannel may fail TLS to `registry.npmjs.org` (npm itself is fine).
 15. **winget** isn't available under SYSTEM/WinRM: the scripts use direct downloads.
+16. **Subscription governance deallocates VMs overnight.** Symptom: the overnight run stops, Windows logs a clean shutdown
+    (event 1074 by `svchost.exe` on behalf of SYSTEM), and the activity log shows `virtualMachines/deallocate` by a
+    **service principal**, not a user, followed by `disks/write` (OS disk switched to Standard HDD). It's neither Copilot,
+    Windows Update nor sleep. Check before choosing a subscription:
+    ```powershell
+    # --max-events matters: the default is only 50 events
+    az monitor activity-log list --subscription <sub> --offset 14d --max-events 20000 -o json | ConvertFrom-Json |
+      Where-Object { $_.operationName.value -match 'deallocate' -and $_.caller -notmatch '@' } |
+      ForEach-Object { "$($_.eventTimestamp) $($_.caller) $($_.resourceId)" }
+    ```
+    A governance resource group (tagged e.g. `CreatedByPolicy`) or subscription tags such as `TimeZone` are another hint.
+    Afterwards, switch the disk back with `az disk update --sku Premium_LRS` (the VM has to be deallocated for that).
 
 ## Repo layout
 
